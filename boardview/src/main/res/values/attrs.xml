@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="boardview">
+        <attr name="bvMaxTileSize" format="dimension" />
+    </declare-styleable>
+
+    <declare-styleable name="tiledboardview">
+        <attr name="tbvTileBackground" format="reference" />
+    </declare-styleable>
+</resources>

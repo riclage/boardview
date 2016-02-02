@@ -1,0 +1,30 @@
+<resources>
+    <string name="app_name">A Word Search Game</string>
+    <string-array name="valid_words">
+        <item>time</item>
+        <item>person</item>
+        <item>year</item>
+        <item>way</item>
+        <item>day</item>
+        <item>thing</item>
+        <item>man</item>
+        <item>world</item>
+        <item>life</item>
+        <item>hand</item>
+        <item>part</item>
+        <item>child</item>
+        <item>eye</item>
+        <item>woman</item>
+        <item>place</item>
+        <item>work</item>
+        <item>week</item>
+        <item>case</item>
+        <item>point</item>
+        <item>government</item>
+        <item>company</item>
+        <item>number</item>
+        <item>group</item>
+        <item>problem</item>
+        <item>fact</item>
+    </string-array>
+</resources>
