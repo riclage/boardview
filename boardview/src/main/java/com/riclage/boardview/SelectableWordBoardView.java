@@ -114,7 +114,7 @@ public class SelectableWordBoardView extends TiledBoardView {
         int row = startRow; int col = startCol;
         for (char wordLetter : word.toCharArray()) {
             String boardLetter = letterBoard[row][col];
-            if (!TextUtils.isEmpty(boardLetter) && !boardLetter.equals(wordLetter)) {
+            if (!TextUtils.isEmpty(boardLetter) && !boardLetter.equals(String.valueOf(wordLetter))) {
                 return false;
             }
 
