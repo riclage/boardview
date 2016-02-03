@@ -38,7 +38,7 @@ public class WordBoardView extends TiledBoardView {
          *                        positions of each word's letters.
          * @return True if the word is valid and should be kept selected
          */
-        boolean onWordSelected(String selectedWord, List<int[]> letterPositions);
+        boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @WordSelectionType int direction);
     }
 
     private SelectedWord currentSelectedWord;
@@ -72,7 +72,7 @@ public class WordBoardView extends TiledBoardView {
     }
 
     @Override
-    protected void setBoardTiles(Context context) {
+    protected void initBoardTileViews(Context context) {
         for (int i = 0; i < getTileCount(); i++) {
             LetterTileView tileView = new LetterTileView(context);
             tileView.setBackgroundResource(getTileBackgroundDrawableResId());
@@ -88,6 +88,17 @@ public class WordBoardView extends TiledBoardView {
         for (SelectedWord word : selectedWordsToClear) {
             updateTiles(word.selectedTiles, false, false);
         }
+    }
+
+    protected BoardPoint shift(BoardPoint point, @WordSelectionType int selectionType) {
+        if (selectionType == WORD_SELECTION_TOP_TO_BOTTOM) {
+            return new BoardPoint(point.row + 1, point.col);
+        } else if (selectionType == WORD_SELECTION_LEFT_TO_RIGHT) {
+            return new BoardPoint(point.row, point.col + 1);
+        } else if (selectionType == WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT) {
+            return new BoardPoint(point.row + 1, point.col + 1);
+        }
+        return point;
     }
 
     /**
@@ -110,22 +121,15 @@ public class WordBoardView extends TiledBoardView {
         }
     }
 
-    private boolean canInsertWordOnBoard(String word, @WordSelectionType int selectionType, int startRow, int startCol, String[][] letterBoard) {
-        int row = startRow; int col = startCol;
+    private boolean canInsertWordOnBoard(String word, BoardPoint startPoint, @WordSelectionType int selectionType, String[][] letterBoard) {
+        BoardPoint currPoint = startPoint;
         for (char wordLetter : word.toCharArray()) {
-            String boardLetter = letterBoard[row][col];
+            String boardLetter = letterBoard[currPoint.row][currPoint.col];
             if (!TextUtils.isEmpty(boardLetter) && !boardLetter.equals(String.valueOf(wordLetter))) {
                 return false;
             }
 
-            if (selectionType == WORD_SELECTION_TOP_TO_BOTTOM) {
-                row++;
-            } else if (selectionType == WORD_SELECTION_LEFT_TO_RIGHT) {
-                col++;
-            } else if (selectionType == WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT) {
-                row++;
-                col++;
-            }
+            currPoint = shift(currPoint, selectionType);
         }
         return true;
     }
@@ -161,23 +165,17 @@ public class WordBoardView extends TiledBoardView {
                     : (boardSize - word.length() == 0 ? 0 : r.nextInt(boardSize - word.length()));
                 col = selectionType == WORD_SELECTION_TOP_TO_BOTTOM ? r.nextInt(boardSize)
                     : (boardSize - word.length() == 0 ? 0 : r.nextInt(boardSize - word.length()));
-            } while (tries++ < 100 && !canInsertWordOnBoard(word, selectionType, row, col, letterBoard));
+            } while (tries++ < 100 && !canInsertWordOnBoard(word, new BoardPoint(row, col), selectionType, letterBoard));
 
             if (tries == 100) break;
 
-            List<int[]> location = new ArrayList<>(word.length());
+            BoardPoint startPoint = new BoardPoint(row, col);
+            BoardPoint currPoint = startPoint;
             for (char c : word.toCharArray()) {
-                location.add(new int[]{row, col});
-
-                if (selectionType == WORD_SELECTION_TOP_TO_BOTTOM) {
-                    letterBoard[row++][col] = String.valueOf(c);
-                } else if (selectionType == WORD_SELECTION_LEFT_TO_RIGHT) {
-                    letterBoard[row][col++] = String.valueOf(c);
-                } else if (selectionType == WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT) {
-                    letterBoard[row++][col++] = String.valueOf(c);
-                }
+                letterBoard[currPoint.row][currPoint.col] = String.valueOf(c);
+                currPoint = shift(currPoint, selectionType);
             }
-            wordLocations.add(new BoardWord(word, selectionType, location));
+            wordLocations.add(new BoardWord(word, selectionType, startPoint));
         }
 
         for (int row = 0; row < letterBoard.length; row++) {
@@ -279,7 +277,7 @@ public class WordBoardView extends TiledBoardView {
                 break;
             case MotionEvent.ACTION_UP:
                 if (currentSelectedWord != null) {
-                    boolean isValidSelection = (listener != null && listener.onWordSelected(currentSelectedWord.toString(), currentSelectedWord.getLettersPositions()));
+                    boolean isValidSelection = (listener != null && listener.onWordSelected(currentSelectedWord.toString(), currentSelectedWord.getLettersPositions(), currentSelectedWord.selectionType));
                     updateTiles(currentSelectedWord.selectedTiles, false, isValidSelection);
                     if (isValidSelection) {
                         selectedWords.add(currentSelectedWord);

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.riclage.boardview.BoardPoint;
 import com.riclage.boardview.BoardWord;
 import com.riclage.boardview.WordBoardView;
 
@@ -95,12 +96,9 @@ public class MainActivity extends AppCompatActivity implements WordBoardView.OnW
     }
 
     @Override
-    public boolean onWordSelected(String selectedWord, List<int[]> letterPositions) {
+    public boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @WordBoardView.WordSelectionType int direction) {
         for (BoardWord word : getCurrentGame().getTargetWords()) {
-            if (selectedWord.equals(word.toString())
-                    //This check is necessary because we might have overlapping words: e.g., car and card.
-                    //If the user selected "car" from the "card" tiles, we must not accept it.
-                    && intArrayListEquals(letterPositions, word.getWordLocation())) {
+            if (word.equals(new BoardWord(selectedWord, direction, new BoardPoint(letterPositions.get(0)[0], letterPositions.get(0)[1])))) {
                 getCurrentGame().addSelectedWord(word);
                 if (getCurrentGame().isFinished()) {
                     onGameFinished();
@@ -132,20 +130,4 @@ public class MainActivity extends AppCompatActivity implements WordBoardView.OnW
             public void onAnimationRepeat(Animator animation) {}
         });
     }
-
-    private boolean intArrayListEquals(List<int[]> a, List<int[]> b) {
-        if (a == null) return false;
-        if (b == null) return false;
-        if (a.size() != b.size()) return false;
-        for (int i = 0; i < a.size(); i++) {
-            int x[] = a.get(i);
-            int y[] = b.get(i);
-            if (x.length != y.length) return false;
-            for (int j = 0; j < x.length; j++) {
-                if (x[j] != y[j]) return false;
-            }
-        }
-        return true;
-    }
-
 }

@@ -7,16 +7,16 @@ import static com.riclage.boardview.WordBoardView.*;
 public class BoardWord {
     private final String word;
     private final @WordSelectionType int wordSelectionType;
-    private final List<int[]> wordLocation;
+    private final BoardPoint startPoint;
 
-    public BoardWord(String word, @WordSelectionType int wordSelectionType, List<int[]> location) {
+    public BoardWord(String word, @WordSelectionType int wordSelectionType, BoardPoint startPoint) {
         this.word = word;
         this.wordSelectionType = wordSelectionType;
-        this.wordLocation = location;
+        this.startPoint = startPoint;
     }
 
-    public List<int[]> getWordLocation() {
-        return wordLocation;
+    public BoardPoint getWordStartPoint() {
+        return startPoint;
     }
 
     public @WordSelectionType int getWordSelectionType() {
@@ -28,15 +28,25 @@ public class BoardWord {
         return word;
     }
 
-    public boolean overlaps(List<BoardWord> wordsToCheck) {
-        for (BoardWord word : wordsToCheck) {
-            if (word.getWordSelectionType() == getWordSelectionType()) {
-                if (getWordSelectionType() == WORD_SELECTION_TOP_TO_BOTTOM
-                        && getWordLocation().get(0)[0] == word.getWordLocation().get(0)[0]) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BoardWord boardWord = (BoardWord) o;
+
+        if (!word.equals(boardWord.word)) return false;
+        //This check is necessary because we might have overlapping words: e.g., car and card.
+        //If the user selected "car" from the "card" tiles, we must not accept it.
+        return wordSelectionType == boardWord.wordSelectionType && startPoint.equals(boardWord.startPoint);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = word.hashCode();
+        result = 31 * result + wordSelectionType;
+        result = 31 * result + startPoint.hashCode();
+        return result;
     }
 }

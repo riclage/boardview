@@ -44,10 +44,10 @@ public abstract class TiledBoardView extends BoardView {
             attrsArray.recycle();
         }
 
-        setBoardTiles(context);
+        initBoardTileViews(context);
     }
 
-    protected abstract void setBoardTiles(Context context);
+    protected abstract void initBoardTileViews(Context context);
 
     protected @DrawableRes int getTileBackgroundDrawableResId() {
         return tileBackgroundDrawableResId;
@@ -79,7 +79,7 @@ public abstract class TiledBoardView extends BoardView {
     public void invalidate() {
         super.invalidate();
         removeAllViews();
-        setBoardTiles(getContext());
+        initBoardTileViews(getContext());
     }
 
     public int getTileCount() {
