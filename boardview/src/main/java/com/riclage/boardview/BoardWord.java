@@ -2,7 +2,7 @@ package com.riclage.boardview;
 
 import java.util.List;
 
-import static com.riclage.boardview.SelectableWordBoardView.*;
+import static com.riclage.boardview.WordBoardView.*;
 
 public class BoardWord {
     private final String word;

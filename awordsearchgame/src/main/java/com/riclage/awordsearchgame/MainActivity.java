@@ -7,7 +7,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.riclage.boardview.BoardWord;
-import com.riclage.boardview.SelectableWordBoardView;
+import com.riclage.boardview.WordBoardView;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
  *
  * Created by Ricardo on 27/01/2016.
  */
-public class MainActivity extends AppCompatActivity implements SelectableWordBoardView.OnWordSelectedListener {
+public class MainActivity extends AppCompatActivity implements WordBoardView.OnWordSelectedListener {
 
     public static final String IS_GAME_ACTIVE_EXTRA = "is_game_active";
 
@@ -26,7 +26,7 @@ public class MainActivity extends AppCompatActivity implements SelectableWordBoa
     private boolean isGameActive = false;
 
     private TextView targetWordsView;
-    private SelectableWordBoardView boardView;
+    private WordBoardView boardView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements SelectableWordBoa
         setContentView(R.layout.activity_main);
 
         targetWordsView = (TextView) findViewById(R.id.target_words_text_view);
-        boardView = (SelectableWordBoardView) findViewById(R.id.board_view);
+        boardView = (WordBoardView) findViewById(R.id.board_view);
 
         if (savedInstanceState == null) {
             dataSource = new GameGenerator();

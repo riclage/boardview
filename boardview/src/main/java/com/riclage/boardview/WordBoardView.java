@@ -18,7 +18,7 @@ import java.util.Random;
  *
  * Created by Ricardo on 27/01/2016.
  */
-public class SelectableWordBoardView extends TiledBoardView {
+public class WordBoardView extends TiledBoardView {
 
     public static final int WORD_SELECTION_UNKNOWN = 0;
     public static final int WORD_SELECTION_LEFT_TO_RIGHT = 1;
@@ -46,23 +46,23 @@ public class SelectableWordBoardView extends TiledBoardView {
 
     private OnWordSelectedListener listener;
 
-    public SelectableWordBoardView(Context context) {
+    public WordBoardView(Context context) {
         super(context);
         init();
     }
 
-    public SelectableWordBoardView(Context context, AttributeSet attrs) {
+    public WordBoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public SelectableWordBoardView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public WordBoardView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
     @SuppressWarnings("unused")
-    public SelectableWordBoardView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public WordBoardView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         init();
     }
