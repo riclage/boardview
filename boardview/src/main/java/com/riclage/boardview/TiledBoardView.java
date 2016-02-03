@@ -86,35 +86,16 @@ public abstract class TiledBoardView extends BoardView {
         return getNumCols() * getNumRows();
     }
 
-    protected static class Tile implements Parcelable {
-        protected final int row, col;
+    protected static class Tile extends BoardPoint implements Parcelable {
         protected View view;
 
         public Tile(int row, int col, View view) {
-            this.row = row;
-            this.col = col;
+            super(row, col);
             this.view = view;
         }
 
         protected Tile(Parcel in) {
-            row = in.readInt();
-            col = in.readInt();
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Tile that = (Tile) o;
-            return row == that.row && col == that.col;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = row;
-            result = 31 * result + col;
-            return result;
+            super(in.readInt(), in.readInt());
         }
 
         @Override
