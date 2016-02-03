@@ -7,6 +7,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -325,39 +326,18 @@ public class WordBoardView extends TiledBoardView {
      */
     private List<Tile> getTilesBetween(Tile startTile, Tile endTile) {
         List<Tile> tiles = new ArrayList<>();
-        @Direction int selectionType = getDirection(startTile, endTile);
-        if (selectionType == DIRECTION_LEFT_TO_RIGHT) {
-            for (int i = startTile.col + 1; i <= endTile.col; i++) {
-                View child = getChildAt(startTile.row, i);
-                Tile t = new Tile(startTile.row, i, child);
-                if (isTileSelected(t, selectionType)) {
+        @Direction int direction = getDirection(startTile, endTile);
+        BoardPoint currPoint = startTile;
+        if (direction != DIRECTION_UNKNOWN) {
+            while (!currPoint.equals(endTile)) {
+                currPoint = shift(currPoint, direction);
+
+                View child = getChildAt(currPoint.row, currPoint.col);
+                Tile t = new Tile(currPoint.row, currPoint.col, child);
+                if (isTileSelected(t, direction)) {
                     break;
                 } else {
                     tiles.add(t);
-                }
-            }
-        } else if (selectionType == DIRECTION_TOP_TO_BOTTOM) {
-            for (int i = startTile.row + 1; i <= endTile.row; i++) {
-                View child = getChildAt(i, startTile.col);
-                Tile t = new Tile(i, startTile.col, child);
-                if (isTileSelected(t, selectionType)) {
-                    break;
-                } else {
-                    tiles.add(t);
-                }
-            }
-        } else if (selectionType == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
-            for (int r = startTile.row + 1; r <= endTile.row; r++) {
-                for (int c = startTile.col + 1; c <= endTile.col; c++) {
-                    if (startTile.row - r == startTile.col - c) {
-                        View child = getChildAt(r, c);
-                        Tile t = new Tile(r, c, child);
-                        if (isTileSelected(t, selectionType)) {
-                            break;
-                        } else {
-                            tiles.add(t);
-                        }
-                    }
                 }
             }
         }
