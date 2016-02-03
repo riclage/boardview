@@ -5,12 +5,12 @@ import static com.riclage.boardview.WordBoardView.*;
 public class BoardWord {
     private final String word;
     private final @Direction
-    int wordSelectionType;
+    int direction;
     private final BoardPoint startPoint;
 
-    public BoardWord(String word, @Direction int wordSelectionType, BoardPoint startPoint) {
+    public BoardWord(String word, @Direction int direction, BoardPoint startPoint) {
         this.word = word;
-        this.wordSelectionType = wordSelectionType;
+        this.direction = direction;
         this.startPoint = startPoint;
     }
 
@@ -19,8 +19,8 @@ public class BoardWord {
     }
 
     public @Direction
-    int getWordSelectionType() {
-        return wordSelectionType;
+    int getDirection() {
+        return direction;
     }
 
     @Override
@@ -38,14 +38,14 @@ public class BoardWord {
         if (!word.equals(boardWord.word)) return false;
         //This check is necessary because we might have overlapping words: e.g., car and card.
         //If the user selected "car" from the "card" tiles, we must not accept it.
-        return wordSelectionType == boardWord.wordSelectionType && startPoint.equals(boardWord.startPoint);
+        return direction == boardWord.direction && startPoint.equals(boardWord.startPoint);
 
     }
 
     @Override
     public int hashCode() {
         int result = word.hashCode();
-        result = 31 * result + wordSelectionType;
+        result = 31 * result + direction;
         result = 31 * result + startPoint.hashCode();
         return result;
     }

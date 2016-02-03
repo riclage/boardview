@@ -7,7 +7,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -35,11 +34,9 @@ public class WordBoardView extends TiledBoardView {
          * Listener for the clients of this board to tell it whether a selected word is valid or not.
          * If a selected word is valid, the board will highlight it, otherwise it will be discarded.
          * @param selectedWord the selected word
-         * @param letterPositions List of int[] arrays containing, respectively, the row and column
-         *                        positions of each word's letters.
          * @return True if the word is valid and should be kept selected
          */
-        boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @Direction int direction);
+        boolean onWordSelected(BoardWord selectedWord);
     }
 
     private SelectedWord currentSelectedWord;
@@ -278,7 +275,7 @@ public class WordBoardView extends TiledBoardView {
                 break;
             case MotionEvent.ACTION_UP:
                 if (currentSelectedWord != null) {
-                    boolean isValidSelection = (listener != null && listener.onWordSelected(currentSelectedWord.toString(), currentSelectedWord.getLettersPositions(), currentSelectedWord.direction));
+                    boolean isValidSelection = (listener != null && listener.onWordSelected(currentSelectedWord.toBoardWord()));
                     updateTiles(currentSelectedWord.selectedTiles, false, isValidSelection);
                     if (isValidSelection) {
                         selectedWords.add(currentSelectedWord);
@@ -445,16 +442,8 @@ public class WordBoardView extends TiledBoardView {
             return letters.toString();
         }
 
-        /**
-         * @return List of int[] arrays containing, respectively, the row and column
-         *         positions of each word's letters.
-         */
-        public List<int[]> getLettersPositions() {
-            List<int[]> letterLocation = new ArrayList<>(selectedTiles.size());
-            for (Tile tile : selectedTiles) {
-                letterLocation.add(new int[]{tile.row, tile.col});
-            }
-            return letterLocation;
+        public BoardWord toBoardWord() {
+            return new BoardWord(toString(), direction, getInitialTile());
         }
 
         @Override

@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.riclage.boardview.BoardPoint;
 import com.riclage.boardview.BoardWord;
 import com.riclage.boardview.WordBoardView;
 
@@ -96,9 +95,9 @@ public class MainActivity extends AppCompatActivity implements WordBoardView.OnW
     }
 
     @Override
-    public boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @WordBoardView.Direction int direction) {
+    public boolean onWordSelected(BoardWord selectedWord) {
         for (BoardWord word : getCurrentGame().getTargetWords()) {
-            if (word.equals(new BoardWord(selectedWord, direction, new BoardPoint(letterPositions.get(0)[0], letterPositions.get(0)[1])))) {
+            if (word.equals(selectedWord)) {
                 getCurrentGame().addSelectedWord(word);
                 if (getCurrentGame().isFinished()) {
                     onGameFinished();
