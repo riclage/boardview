@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -88,17 +87,6 @@ public class WordBoardView extends TiledBoardView {
         }
     }
 
-    protected BoardPoint shift(BoardPoint point, @Direction int selectionType) {
-        if (selectionType == DIRECTION_TOP_TO_BOTTOM) {
-            return new BoardPoint(point.row + 1, point.col);
-        } else if (selectionType == DIRECTION_LEFT_TO_RIGHT) {
-            return new BoardPoint(point.row, point.col + 1);
-        } else if (selectionType == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
-            return new BoardPoint(point.row + 1, point.col + 1);
-        }
-        return point;
-    }
-
     /**
      * Sets the given letters on the grid
      * @param letterBoard A 2-d (row-by-col) array containing the letters to set
@@ -127,7 +115,7 @@ public class WordBoardView extends TiledBoardView {
                 return false;
             }
 
-            currPoint = shift(currPoint, selectionType);
+            currPoint = shift(currPoint, selectionType, 1);
         }
         return true;
     }
@@ -171,7 +159,7 @@ public class WordBoardView extends TiledBoardView {
             BoardPoint currPoint = startPoint;
             for (char c : word.toCharArray()) {
                 letterBoard[currPoint.row][currPoint.col] = String.valueOf(c);
-                currPoint = shift(currPoint, selectionType);
+                currPoint = shift(currPoint, selectionType, 1);
             }
             wordLocations.add(new BoardWord(word, selectionType, startPoint));
         }
@@ -296,7 +284,7 @@ public class WordBoardView extends TiledBoardView {
                 for (Tile wordTile : word.selectedTiles) {
                     //Check also the previous tile in the same direction to prevent connected
                     //selected tiles for different words from happening
-                    if (wordTile.equals(tile) || wordTile.equals(getPreviousTile(tile, direction))) {
+                    if (wordTile.equals(tile) || wordTile.equals(shift(tile, direction, -1))) {
                         return true;
                     }
                 }
@@ -327,7 +315,7 @@ public class WordBoardView extends TiledBoardView {
         BoardPoint currPoint = startTile;
         if (direction != DIRECTION_UNKNOWN) {
             while (!currPoint.equals(endTile)) {
-                currPoint = shift(currPoint, direction);
+                currPoint = shift(currPoint, direction, 1);
 
                 View child = getChildAt(currPoint.row, currPoint.col);
                 Tile t = new Tile(currPoint.row, currPoint.col, child);
@@ -339,27 +327,6 @@ public class WordBoardView extends TiledBoardView {
             }
         }
         return tiles;
-    }
-
-    /**
-     * @return The previous tile of a given tile or null if the given tile is at the edge of the
-     * board for the given selection type.
-     */
-    private @Nullable Tile getPreviousTile(Tile currentTile, @Direction int selectionType) {
-        if (selectionType == DIRECTION_LEFT_TO_RIGHT) {
-            int row = currentTile.row;
-            int col = currentTile.col - 1;
-            return currentTile.col == 0 ? null : new Tile(row, col, getChildAt(row, col));
-        } else if (selectionType == DIRECTION_TOP_TO_BOTTOM) {
-            int row = currentTile.row - 1;
-            int col = currentTile.col;
-            return currentTile.row == 0 ? null : new Tile(row, col, getChildAt(row, col));
-        } else if (selectionType == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
-            int row = currentTile.row - 1;
-            int col = currentTile.col - 1;
-            return currentTile.row == 0 || currentTile.col == 0 ? null : new Tile(row, col, getChildAt(row, col));
-        }
-        return null;
     }
 
     private static @Direction
@@ -377,6 +344,17 @@ public class WordBoardView extends TiledBoardView {
         } else {
             return DIRECTION_UNKNOWN;
         }
+    }
+
+    private BoardPoint shift(BoardPoint point, @Direction int direction, int n) {
+        if (direction == DIRECTION_TOP_TO_BOTTOM) {
+            return new BoardPoint(point.row + n, point.col);
+        } else if (direction == DIRECTION_LEFT_TO_RIGHT) {
+            return new BoardPoint(point.row, point.col + n);
+        } else if (direction == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
+            return new BoardPoint(point.row + n, point.col + n);
+        }
+        return point;
     }
 
     private static class SelectedWord implements Parcelable {
