@@ -9,6 +9,8 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -24,6 +26,7 @@ public class WordBoardView extends TiledBoardView {
     public static final int DIRECTION_TOP_TO_BOTTOM = 2;
     public static final int DIRECTION_TOP_BOTTOM_LEFT_RIGHT = 3;
 
+    @Retention(RetentionPolicy.SOURCE)
     @IntDef({DIRECTION_UNKNOWN, DIRECTION_LEFT_TO_RIGHT, DIRECTION_TOP_TO_BOTTOM, DIRECTION_TOP_BOTTOM_LEFT_RIGHT})
     public @interface Direction {}
 
@@ -311,7 +314,7 @@ public class WordBoardView extends TiledBoardView {
      */
     private List<Tile> getTilesBetween(Tile startTile, Tile endTile) {
         List<Tile> tiles = new ArrayList<>();
-        @Direction int direction = getDirection(startTile, endTile);
+        @Direction int direction = startTile.getDirectionFrom(endTile);
         BoardPoint currPoint = startTile;
         if (direction != DIRECTION_UNKNOWN) {
             while (!currPoint.equals(endTile)) {
@@ -327,23 +330,6 @@ public class WordBoardView extends TiledBoardView {
             }
         }
         return tiles;
-    }
-
-    private static @Direction
-    int getDirection(Tile previousTile, Tile currTile) {
-        if (previousTile.row == currTile.row
-                && previousTile.col < currTile.col) {
-            return DIRECTION_LEFT_TO_RIGHT;
-        } else if (previousTile.row < currTile.row
-                && previousTile.col == currTile.col) {
-            return DIRECTION_TOP_TO_BOTTOM;
-        } else if (previousTile.row < currTile.row
-                && previousTile.col < currTile.col
-                && previousTile.row - currTile.row == previousTile.col - currTile.col) {
-            return DIRECTION_TOP_BOTTOM_LEFT_RIGHT;
-        } else {
-            return DIRECTION_UNKNOWN;
-        }
     }
 
     private BoardPoint shift(BoardPoint point, @Direction int direction, int n) {
@@ -390,11 +376,11 @@ public class WordBoardView extends TiledBoardView {
         };
 
         public boolean isTileValid(Tile tile) {
-            return getDirection(getInitialTile(), tile) != DIRECTION_UNKNOWN;
+            return getInitialTile().getDirectionFrom(tile) != DIRECTION_UNKNOWN;
         }
 
         public boolean isTileAllowed(Tile tile) {
-            @Direction int currType = getDirection(lastTile, tile);
+            @Direction int currType = lastTile.getDirectionFrom(tile);
             return currType != DIRECTION_UNKNOWN
                     && (direction == DIRECTION_UNKNOWN || direction == currType);
         }
@@ -405,7 +391,7 @@ public class WordBoardView extends TiledBoardView {
 
         public void addTiles(List<Tile> tiles) {
             if (direction == DIRECTION_UNKNOWN) {
-                direction = getDirection(lastTile, tiles.get(0));
+                direction = lastTile.getDirectionFrom(tiles.get(0));
             }
             selectedTiles.addAll(tiles);
             lastTile = selectedTiles.get(selectedTiles.size() - 1);
