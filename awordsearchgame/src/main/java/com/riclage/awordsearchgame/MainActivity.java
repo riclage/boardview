@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity implements WordBoardView.OnW
     }
 
     @Override
-    public boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @WordBoardView.WordSelectionType int direction) {
+    public boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @WordBoardView.Direction int direction) {
         for (BoardWord word : getCurrentGame().getTargetWords()) {
             if (word.equals(new BoardWord(selectedWord, direction, new BoardPoint(letterPositions.get(0)[0], letterPositions.get(0)[1])))) {
                 getCurrentGame().addSelectedWord(word);

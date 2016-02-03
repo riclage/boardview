@@ -1,15 +1,14 @@
 package com.riclage.boardview;
 
-import java.util.List;
-
 import static com.riclage.boardview.WordBoardView.*;
 
 public class BoardWord {
     private final String word;
-    private final @WordSelectionType int wordSelectionType;
+    private final @Direction
+    int wordSelectionType;
     private final BoardPoint startPoint;
 
-    public BoardWord(String word, @WordSelectionType int wordSelectionType, BoardPoint startPoint) {
+    public BoardWord(String word, @Direction int wordSelectionType, BoardPoint startPoint) {
         this.word = word;
         this.wordSelectionType = wordSelectionType;
         this.startPoint = startPoint;
@@ -19,7 +18,8 @@ public class BoardWord {
         return startPoint;
     }
 
-    public @WordSelectionType int getWordSelectionType() {
+    public @Direction
+    int getWordSelectionType() {
         return wordSelectionType;
     }
 

@@ -20,13 +20,13 @@ import java.util.Random;
  */
 public class WordBoardView extends TiledBoardView {
 
-    public static final int WORD_SELECTION_UNKNOWN = 0;
-    public static final int WORD_SELECTION_LEFT_TO_RIGHT = 1;
-    public static final int WORD_SELECTION_TOP_TO_BOTTOM = 2;
-    public static final int WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT = 3;
+    public static final int DIRECTION_UNKNOWN = 0;
+    public static final int DIRECTION_LEFT_TO_RIGHT = 1;
+    public static final int DIRECTION_TOP_TO_BOTTOM = 2;
+    public static final int DIRECTION_TOP_BOTTOM_LEFT_RIGHT = 3;
 
-    @IntDef({WORD_SELECTION_UNKNOWN, WORD_SELECTION_LEFT_TO_RIGHT, WORD_SELECTION_TOP_TO_BOTTOM, WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT})
-    public @interface WordSelectionType {}
+    @IntDef({DIRECTION_UNKNOWN, DIRECTION_LEFT_TO_RIGHT, DIRECTION_TOP_TO_BOTTOM, DIRECTION_TOP_BOTTOM_LEFT_RIGHT})
+    public @interface Direction {}
 
 
     public interface OnWordSelectedListener {
@@ -38,7 +38,7 @@ public class WordBoardView extends TiledBoardView {
          *                        positions of each word's letters.
          * @return True if the word is valid and should be kept selected
          */
-        boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @WordSelectionType int direction);
+        boolean onWordSelected(String selectedWord, List<int[]> letterPositions, @Direction int direction);
     }
 
     private SelectedWord currentSelectedWord;
@@ -90,12 +90,12 @@ public class WordBoardView extends TiledBoardView {
         }
     }
 
-    protected BoardPoint shift(BoardPoint point, @WordSelectionType int selectionType) {
-        if (selectionType == WORD_SELECTION_TOP_TO_BOTTOM) {
+    protected BoardPoint shift(BoardPoint point, @Direction int selectionType) {
+        if (selectionType == DIRECTION_TOP_TO_BOTTOM) {
             return new BoardPoint(point.row + 1, point.col);
-        } else if (selectionType == WORD_SELECTION_LEFT_TO_RIGHT) {
+        } else if (selectionType == DIRECTION_LEFT_TO_RIGHT) {
             return new BoardPoint(point.row, point.col + 1);
-        } else if (selectionType == WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT) {
+        } else if (selectionType == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
             return new BoardPoint(point.row + 1, point.col + 1);
         }
         return point;
@@ -121,7 +121,7 @@ public class WordBoardView extends TiledBoardView {
         }
     }
 
-    private boolean canInsertWordOnBoard(String word, BoardPoint startPoint, @WordSelectionType int selectionType, String[][] letterBoard) {
+    private boolean canInsertWordOnBoard(String word, BoardPoint startPoint, @Direction int selectionType, String[][] letterBoard) {
         BoardPoint currPoint = startPoint;
         for (char wordLetter : word.toCharArray()) {
             String boardLetter = letterBoard[currPoint.row][currPoint.col];
@@ -153,7 +153,7 @@ public class WordBoardView extends TiledBoardView {
                 throw new IllegalArgumentException("Word '" + word + "' is longer than the specified board size");
             }
 
-            @WordSelectionType int selectionType;
+            @Direction int selectionType;
             int row, col;
             int tries = 0;
             do {
@@ -161,9 +161,9 @@ public class WordBoardView extends TiledBoardView {
                 //noinspection ResourceType
                 selectionType = r.nextInt(3) + 1;
 
-                row = selectionType == WORD_SELECTION_LEFT_TO_RIGHT ? r.nextInt(boardSize)
+                row = selectionType == DIRECTION_LEFT_TO_RIGHT ? r.nextInt(boardSize)
                     : (boardSize - word.length() == 0 ? 0 : r.nextInt(boardSize - word.length()));
-                col = selectionType == WORD_SELECTION_TOP_TO_BOTTOM ? r.nextInt(boardSize)
+                col = selectionType == DIRECTION_TOP_TO_BOTTOM ? r.nextInt(boardSize)
                     : (boardSize - word.length() == 0 ? 0 : r.nextInt(boardSize - word.length()));
             } while (tries++ < 100 && !canInsertWordOnBoard(word, new BoardPoint(row, col), selectionType, letterBoard));
 
@@ -277,7 +277,7 @@ public class WordBoardView extends TiledBoardView {
                 break;
             case MotionEvent.ACTION_UP:
                 if (currentSelectedWord != null) {
-                    boolean isValidSelection = (listener != null && listener.onWordSelected(currentSelectedWord.toString(), currentSelectedWord.getLettersPositions(), currentSelectedWord.selectionType));
+                    boolean isValidSelection = (listener != null && listener.onWordSelected(currentSelectedWord.toString(), currentSelectedWord.getLettersPositions(), currentSelectedWord.direction));
                     updateTiles(currentSelectedWord.selectedTiles, false, isValidSelection);
                     if (isValidSelection) {
                         selectedWords.add(currentSelectedWord);
@@ -291,14 +291,14 @@ public class WordBoardView extends TiledBoardView {
         return true;
     }
 
-    private boolean isTileSelected(Tile tile, @WordSelectionType int selectionType) {
+    private boolean isTileSelected(Tile tile, @Direction int direction) {
         for (SelectedWord word : selectedWords) {
             //A selected tile cannot be selected again for the same selection type
-            if (selectionType == WORD_SELECTION_UNKNOWN || word.selectionType == selectionType) {
+            if (direction == DIRECTION_UNKNOWN || word.direction == direction) {
                 for (Tile wordTile : word.selectedTiles) {
                     //Check also the previous tile in the same direction to prevent connected
                     //selected tiles for different words from happening
-                    if (wordTile.equals(tile) || wordTile.equals(getPreviousTile(tile, selectionType))) {
+                    if (wordTile.equals(tile) || wordTile.equals(getPreviousTile(tile, direction))) {
                         return true;
                     }
                 }
@@ -315,7 +315,7 @@ public class WordBoardView extends TiledBoardView {
         for (Tile tile : tiles) {
             tile.view.setPressed(pressed);
             //Keep the tile selected if it belongs to a previously selected word
-            tile.view.setSelected(selected || isTileSelected(tile, WORD_SELECTION_UNKNOWN));
+            tile.view.setSelected(selected || isTileSelected(tile, DIRECTION_UNKNOWN));
         }
     }
 
@@ -325,8 +325,8 @@ public class WordBoardView extends TiledBoardView {
      */
     private List<Tile> getTilesBetween(Tile startTile, Tile endTile) {
         List<Tile> tiles = new ArrayList<>();
-        @WordSelectionType int selectionType = getSelectionType(startTile, endTile);
-        if (selectionType == WORD_SELECTION_LEFT_TO_RIGHT) {
+        @Direction int selectionType = getDirection(startTile, endTile);
+        if (selectionType == DIRECTION_LEFT_TO_RIGHT) {
             for (int i = startTile.col + 1; i <= endTile.col; i++) {
                 View child = getChildAt(startTile.row, i);
                 Tile t = new Tile(startTile.row, i, child);
@@ -336,7 +336,7 @@ public class WordBoardView extends TiledBoardView {
                     tiles.add(t);
                 }
             }
-        } else if (selectionType == WORD_SELECTION_TOP_TO_BOTTOM) {
+        } else if (selectionType == DIRECTION_TOP_TO_BOTTOM) {
             for (int i = startTile.row + 1; i <= endTile.row; i++) {
                 View child = getChildAt(i, startTile.col);
                 Tile t = new Tile(i, startTile.col, child);
@@ -346,7 +346,7 @@ public class WordBoardView extends TiledBoardView {
                     tiles.add(t);
                 }
             }
-        } else if (selectionType == WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT) {
+        } else if (selectionType == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
             for (int r = startTile.row + 1; r <= endTile.row; r++) {
                 for (int c = startTile.col + 1; c <= endTile.col; c++) {
                     if (startTile.row - r == startTile.col - c) {
@@ -368,16 +368,16 @@ public class WordBoardView extends TiledBoardView {
      * @return The previous tile of a given tile or null if the given tile is at the edge of the
      * board for the given selection type.
      */
-    private @Nullable Tile getPreviousTile(Tile currentTile, @WordSelectionType int selectionType) {
-        if (selectionType == WORD_SELECTION_LEFT_TO_RIGHT) {
+    private @Nullable Tile getPreviousTile(Tile currentTile, @Direction int selectionType) {
+        if (selectionType == DIRECTION_LEFT_TO_RIGHT) {
             int row = currentTile.row;
             int col = currentTile.col - 1;
             return currentTile.col == 0 ? null : new Tile(row, col, getChildAt(row, col));
-        } else if (selectionType == WORD_SELECTION_TOP_TO_BOTTOM) {
+        } else if (selectionType == DIRECTION_TOP_TO_BOTTOM) {
             int row = currentTile.row - 1;
             int col = currentTile.col;
             return currentTile.row == 0 ? null : new Tile(row, col, getChildAt(row, col));
-        } else if (selectionType == WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT) {
+        } else if (selectionType == DIRECTION_TOP_BOTTOM_LEFT_RIGHT) {
             int row = currentTile.row - 1;
             int col = currentTile.col - 1;
             return currentTile.row == 0 || currentTile.col == 0 ? null : new Tile(row, col, getChildAt(row, col));
@@ -385,24 +385,26 @@ public class WordBoardView extends TiledBoardView {
         return null;
     }
 
-    private static @WordSelectionType int getSelectionType(Tile previousTile, Tile currTile) {
+    private static @Direction
+    int getDirection(Tile previousTile, Tile currTile) {
         if (previousTile.row == currTile.row
                 && previousTile.col < currTile.col) {
-            return WORD_SELECTION_LEFT_TO_RIGHT;
+            return DIRECTION_LEFT_TO_RIGHT;
         } else if (previousTile.row < currTile.row
                 && previousTile.col == currTile.col) {
-            return WORD_SELECTION_TOP_TO_BOTTOM;
+            return DIRECTION_TOP_TO_BOTTOM;
         } else if (previousTile.row < currTile.row
                 && previousTile.col < currTile.col
                 && previousTile.row - currTile.row == previousTile.col - currTile.col) {
-            return WORD_SELECTION_TOP_BOTTOM_LEFT_RIGHT;
+            return DIRECTION_TOP_BOTTOM_LEFT_RIGHT;
         } else {
-            return WORD_SELECTION_UNKNOWN;
+            return DIRECTION_UNKNOWN;
         }
     }
 
     private static class SelectedWord implements Parcelable {
-        private @WordSelectionType int selectionType = WORD_SELECTION_UNKNOWN;
+        private @Direction
+        int direction = DIRECTION_UNKNOWN;
 
         private Tile lastTile;
         private List<Tile> selectedTiles;
@@ -415,7 +417,7 @@ public class WordBoardView extends TiledBoardView {
 
         protected SelectedWord(Parcel in) {
             //noinspection ResourceType
-            selectionType = in.readInt();
+            direction = in.readInt();
             lastTile = in.readParcelable(Tile.class.getClassLoader());
             selectedTiles = in.createTypedArrayList(Tile.CREATOR);
         }
@@ -433,13 +435,13 @@ public class WordBoardView extends TiledBoardView {
         };
 
         public boolean isTileValid(Tile tile) {
-            return getSelectionType(getInitialTile(), tile) != WORD_SELECTION_UNKNOWN;
+            return getDirection(getInitialTile(), tile) != DIRECTION_UNKNOWN;
         }
 
         public boolean isTileAllowed(Tile tile) {
-            @WordSelectionType int currType = getSelectionType(lastTile, tile);
-            return currType != WORD_SELECTION_UNKNOWN
-                    && (selectionType == WORD_SELECTION_UNKNOWN || selectionType == currType);
+            @Direction int currType = getDirection(lastTile, tile);
+            return currType != DIRECTION_UNKNOWN
+                    && (direction == DIRECTION_UNKNOWN || direction == currType);
         }
 
         public Tile getInitialTile() {
@@ -447,8 +449,8 @@ public class WordBoardView extends TiledBoardView {
         }
 
         public void addTiles(List<Tile> tiles) {
-            if (selectionType == WORD_SELECTION_UNKNOWN) {
-                selectionType = getSelectionType(lastTile, tiles.get(0));
+            if (direction == DIRECTION_UNKNOWN) {
+                direction = getDirection(lastTile, tiles.get(0));
             }
             selectedTiles.addAll(tiles);
             lastTile = selectedTiles.get(selectedTiles.size() - 1);
@@ -482,7 +484,7 @@ public class WordBoardView extends TiledBoardView {
 
         @Override
         public void writeToParcel(Parcel dest, int flags) {
-            dest.writeInt(selectionType);
+            dest.writeInt(direction);
             dest.writeParcelable(lastTile, flags);
             dest.writeTypedList(selectedTiles);
         }
