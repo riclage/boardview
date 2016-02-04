@@ -12,19 +12,19 @@ public class BoardPoint {
         this.col = col;
     }
 
-    public @WordBoardView.Direction int getDirectionFrom(BoardPoint other) {
+    public @WordSearchBoardView.Direction int getDirectionFrom(BoardPoint other) {
         if (row == other.row
                 && col < other.col) {
-            return WordBoardView.DIRECTION_LEFT_TO_RIGHT;
+            return WordSearchBoardView.DIRECTION_LEFT_TO_RIGHT;
         } else if (row < other.row
                 && col == other.col) {
-            return WordBoardView.DIRECTION_TOP_TO_BOTTOM;
+            return WordSearchBoardView.DIRECTION_TOP_TO_BOTTOM;
         } else if (row < other.row
                 && col < other.col
                 && row - other.row == col - other.col) {
-            return WordBoardView.DIRECTION_TOP_BOTTOM_LEFT_RIGHT;
+            return WordSearchBoardView.DIRECTION_TOP_BOTTOM_LEFT_RIGHT;
         } else {
-            return WordBoardView.DIRECTION_UNKNOWN;
+            return WordSearchBoardView.DIRECTION_UNKNOWN;
         }
     }
 

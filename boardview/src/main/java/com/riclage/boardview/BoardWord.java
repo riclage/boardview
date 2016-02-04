@@ -1,6 +1,6 @@
 package com.riclage.boardview;
 
-import static com.riclage.boardview.WordBoardView.*;
+import static com.riclage.boardview.WordSearchBoardView.*;
 
 public class BoardWord {
     private final String word;

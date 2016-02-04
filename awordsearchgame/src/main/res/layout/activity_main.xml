@@ -18,7 +18,7 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <com.riclage.boardview.WordBoardView
+        <com.riclage.boardview.WordSearchBoardView
             android:id="@+id/board_view"
             style="@style/BoardView"
             android:layout_width="match_parent"
