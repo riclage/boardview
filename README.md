@@ -39,7 +39,8 @@ Remember to add the custom namespaces to your layout header to use its custom at
 
 Then in your activity or fragment, locate your `WordSearchBoardView` and initialize it:
 
-
+    boardView = (WordSearchBoardView) findViewById(R.id.board_view);
+    
     //Generates a random letter board for the given words and returns their locations on it
     final List<BoardWord> targetWords = boardView.generateRandomLetterBoard(Arrays.asList("word", "search", "game"));
     
@@ -56,6 +57,11 @@ Then in your activity or fragment, locate your `WordSearchBoardView` and initial
             });
 
 See the "awordsearchgame" folder for a sample app using the `WordSearchBoardView`.
+
+#Credits 
+*Author:* Ricardo Lage ([http://www.riclage.com/](http://www.riclage.com/))
+
+[![](http://www.riclage.com/images/linkedin.png)](https://www.linkedin.com/in/ricardo-lage-608457a)
 
 #License
 ```
