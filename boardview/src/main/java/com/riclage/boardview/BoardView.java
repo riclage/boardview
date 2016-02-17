@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.ViewGroup;
 
 
@@ -91,6 +92,20 @@ public abstract class BoardView extends ViewGroup {
         boardWidth = Math.min(tileSize * numCols, getMeasuredWidth());
         boardHeight = Math.min(tileSize * numRows, getMeasuredHeight());
         setMeasuredDimension(boardWidth, boardHeight);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        //Disable parent scrolling when the user is interacting with the board
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                getParent().requestDisallowInterceptTouchEvent(true);
+                break;
+            case MotionEvent.ACTION_UP:
+                getParent().requestDisallowInterceptTouchEvent(false);
+                break;
+        }
+        return super.onTouchEvent(event);
     }
 
     @Override

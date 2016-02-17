@@ -242,6 +242,8 @@ public class WordSearchBoardView extends TiledBoardView {
             return true;
         }
 
+        super.onTouchEvent(event);
+
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
             case MotionEvent.ACTION_MOVE:
