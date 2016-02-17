@@ -6,7 +6,7 @@ BoardView allows you to display boards of different kinds. The current implement
 ![BoardView](http://i.imgur.com/ugDbKBj.png)
 
 # Example
-Install the [sample app](https://play.google.com/store/apps/details?id=com.riclage.awordsearchgame) to see it working.
+Install the [sample app](https://play.google.com/store/apps/details?id=com.riclage.awordsearchgame) to see the `WordSearchBoardView` in practice.
 
 # Usage
 
