@@ -285,7 +285,9 @@ public class WordSearchBoardView extends TiledBoardView {
                     updateTiles(currentSelectedWord.selectedTiles, false, isValidSelection);
                     if (isValidSelection) {
                         selectedWords.add(currentSelectedWord);
+                      if(highlightedListener != null) {
                         highlightedListener.onWordHighlighted(currentSelectedWord.toBoardWord());
+                      }
                     }
                     currentSelectedWord = null;
                 }
