@@ -41,10 +41,19 @@ public class WordSearchBoardView extends TiledBoardView {
         boolean onWordSelected(BoardWord selectedWord);
     }
 
+    public interface OnWordHighlightedListener {
+      /**
+       * Listener for the clients of this board to take action after a word has been successfully highlighted.
+       * @param highlightedWord the highlighted word
+       */
+      void onWordHighlighted(BoardWord highlightedWord);
+    }
+
     private SelectedWord currentSelectedWord;
     private List<SelectedWord> selectedWords;
 
     private OnWordSelectedListener listener;
+    private OnWordHighlightedListener highlightedListener;
 
     public WordSearchBoardView(Context context) {
         super(context);
@@ -184,6 +193,10 @@ public class WordSearchBoardView extends TiledBoardView {
         this.listener = listener;
     }
 
+    public void setOnWordHighlightedListener(OnWordHighlightedListener listener) {
+      this.highlightedListener = listener;
+    }
+
     @Override
     protected Parcelable onSaveInstanceState() {
         List<LetterTile> tiles = new ArrayList<>(getChildCount());
@@ -272,6 +285,9 @@ public class WordSearchBoardView extends TiledBoardView {
                     updateTiles(currentSelectedWord.selectedTiles, false, isValidSelection);
                     if (isValidSelection) {
                         selectedWords.add(currentSelectedWord);
+                      if(highlightedListener != null) {
+                        highlightedListener.onWordHighlighted(currentSelectedWord.toBoardWord());
+                      }
                     }
                     currentSelectedWord = null;
                 }
