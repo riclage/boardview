@@ -58,11 +58,6 @@ Then in your activity or fragment, locate your `WordSearchBoardView` and initial
 
 See the "awordsearchgame" folder for a sample app using the `WordSearchBoardView`.
 
-#Credits 
-*Author:* Ricardo Lage ([http://www.riclage.com/](http://www.riclage.com/))
-
-[![](http://www.riclage.com/images/linkedin.png)](https://www.linkedin.com/in/ricardo-lage-608457a)
-
 #License
 ```
 Copyright 2016 Ricardo Lage
